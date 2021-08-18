@@ -6,8 +6,6 @@ from data_requests.UnixConverter import convert_data_to_unix
 
 
 def get_crypto_value(symbol, resolution, from_date, to_date):
-    print("tutaj")
-    print(symbol)
     parameters = {
         "symbol": symbol,
         "resolution": resolution,
