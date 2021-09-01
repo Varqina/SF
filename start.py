@@ -6,7 +6,6 @@ from database.Database import Database
 database = Database()
 database.add_to_data_base('ADA', 'EUR')
 database.update_candles_on_currency('ADA')
-print(database)
 
 
 
