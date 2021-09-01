@@ -10,6 +10,8 @@ class Database:
         self.main_container = {}
 
     def add_to_data_base(self, crypto_currency_symbol, fiat_symbol):
+        if crypto_currency_symbol in self.main_container and fiat_symbol in self.main_container[crypto_currency_symbol]["M"]:
+            return
         self.main_container[crypto_currency_symbol] = {"1": {}, "5": {}, "15": {}, "30": {}, "60": {}, "D": {}, "W": {},
                                                        "M": {}}
         for resolution in self.main_container[crypto_currency_symbol]:
@@ -18,7 +20,6 @@ class Database:
             candle_objects = change_candles_to_candle_objects(candles_json)
             for candle in candle_objects:
                 self.main_container[crypto_currency_symbol][resolution][fiat_symbol].append(candle)
-
 
     def update_candles_on_currency(self, crypto_currency_symbol):
         latest_date_dict = self.get_latest_dates(crypto_currency_symbol)
