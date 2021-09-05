@@ -1,8 +1,10 @@
+import time
+
 import requests as requests
 import Password.PasswordStrings as list_of_strings
 import json
 
-from data_requests.UnixConverter import convert_data_to_unix
+from data_requests.TimeManager import convert_data_to_unix
 from database.Candle import Candle
 
 
@@ -14,6 +16,7 @@ def get_crypto_values(symbol, resolution, from_date, to_date):
         "from": convert_data_to_unix(from_date),
         "to": convert_data_to_unix(to_date),
         "token": list_of_strings.token}
+    time.sleep(1)
     response = requests.get("https://finnhub.io/api/v1/crypto/candle?", params=parameters)
     return response.json()
 
@@ -23,6 +26,7 @@ def get_all_crypto_symbols(exchange="binance"):
     parameters = {
         "exchange": exchange,
         "token": list_of_strings.token}
+    time.sleep(1)
     response = requests.get("https://finnhub.io/api/v1/crypto/symbol?", params=parameters)
     for symbol in response.json():
         symbols.append(symbol["symbol"])
