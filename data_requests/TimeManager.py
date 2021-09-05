@@ -19,16 +19,15 @@ def convert_unix_to_data(unix_data):
 
 def is_comparable_with_current_time(time_value, resolution):
     compared_value = int(time.time()) - time_value
-    print(compared_value)
     candle_time_value = convert_unix_to_data(time_value)
     current_time = convert_unix_to_data(int(time.time()))
-    if resolution is '1' or resolution is '5':
+    if resolution == '1' or resolution == '5':
         return True if candle_time_value[:16] == current_time[:16] else False
-    elif resolution is '15' or resolution is '30':
+    elif resolution == '15' or resolution == '30':
         return True if candle_time_value[:15] == current_time[:15] else False
-    elif resolution is '60':
+    elif resolution == '60':
         return True if candle_time_value[:13] == current_time[:13] else False
-    elif resolution is 'D' or resolution is 'W':
+    elif resolution == 'D' or resolution == 'W':
         return True if candle_time_value[:10] == current_time[:10] else False
-    elif resolution is 'M':
+    elif resolution == 'M':
         return True if candle_time_value[:7] == current_time[:7] else False

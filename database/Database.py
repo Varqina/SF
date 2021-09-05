@@ -2,6 +2,7 @@ import os
 import time
 import pickle
 from datetime import datetime
+from shutil import copyfile
 
 from data_requests.CryptoRequests import get_crypto_values, change_candles_to_candle_objects
 from data_requests.TimeManager import is_comparable_with_current_time
@@ -50,8 +51,8 @@ class Database:
                                 candle_objects = change_candles_to_candle_objects(candles_json)
                                 for candle in candle_objects:
                                     self.main_container[crypto_currency_symbol][resolution][fiat].append(candle)
+                                    self.save_database()
                 else:
-                    self.save_database()
                     break
 
     def get_latest_dates(self, crypto_currency_symbol):
@@ -68,9 +69,16 @@ class Database:
     def save_database(self):
         with open('data\database.data', 'wb') as database:
             pickle.dump(self.main_container, database)
+            copyfile('data\database.data', 'data\\backup.data')
 
     def load_database(self):
-        file = 'data\database.data'
-        if os.path.isfile(file) and os.path.getsize(file) > 0:
-            with open(file, 'rb') as database:
-                self.main_container = pickle.load(database)
+        try:
+            file = 'data\database.data'
+            if os.path.isfile(file) and os.path.getsize(file) > 0:
+                with open(file, 'rb') as database:
+                    self.main_container = pickle.load(database)
+        except EOFError:
+            file = 'data\\backup.data'
+            if os.path.isfile(file) and os.path.getsize(file) > 0:
+                with open(file, 'rb') as database:
+                    self.main_container = pickle.load(database)

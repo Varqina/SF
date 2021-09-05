@@ -17,7 +17,6 @@ class ApiManager:
 keys = ApiManager()
 
 
-@measure_time
 def get_crypto_values(symbol, resolution, from_date, to_date):
     symbol = get_crypto_symbol(symbol)
     parameters = {
@@ -25,24 +24,22 @@ def get_crypto_values(symbol, resolution, from_date, to_date):
         "resolution": resolution,
         "from": convert_data_to_unix(from_date),
         "to": convert_data_to_unix(to_date),
-        "token": keys.get_api_key}
+        "token": keys.get_api_key()}
     response = requests.get("https://finnhub.io/api/v1/crypto/candle?", params=parameters)
     return response.json()
 
 
-@measure_time
 def get_all_crypto_symbols(exchange="binance"):
     symbols = []
     parameters = {
         "exchange": exchange,
-        "token": keys.get_api_key}
+        "token": keys.get_api_key()}
     response = requests.get("https://finnhub.io/api/v1/crypto/symbol?", params=parameters)
     for symbol in response.json():
         symbols.append(symbol["symbol"])
     return symbols
 
 
-@measure_time
 def get_crypto_symbol(symbol, exchange="binance"):
     symbol = symbol.lower()
     all_symbol_list = get_all_crypto_symbols(exchange)
