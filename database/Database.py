@@ -1,3 +1,4 @@
+import os
 import time
 import pickle
 from datetime import datetime
@@ -64,5 +65,8 @@ class Database:
             pickle.dump(self.main_container, database)
 
     def load_database(self):
-        with open('database\database.data', 'rb') as database:
-            self.main_container = pickle.load(database)
+        file = 'database\database.data'
+        if os.path.isfile(file) and os.path.getsize(file) > 0:
+            print("in")
+            with open('database\database.data', 'rb') as database:
+                self.main_container = pickle.load(database)
