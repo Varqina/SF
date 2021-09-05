@@ -1,4 +1,5 @@
 import time
+import pickle
 from datetime import datetime
 
 from data_requests.CryptoRequests import get_crypto_values, change_candles_to_candle_objects
@@ -12,13 +13,15 @@ class Database:
         self.load_database()
 
     def add_to_data_base(self, crypto_currency_symbol, fiat_symbol):
-        if crypto_currency_symbol in self.main_container and fiat_symbol in self.main_container[crypto_currency_symbol]["M"]:
+        if crypto_currency_symbol in self.main_container and fiat_symbol in self.main_container[crypto_currency_symbol][
+            "M"]:
             return
         self.main_container[crypto_currency_symbol] = {"1": {}, "5": {}, "15": {}, "30": {}, "60": {}, "D": {}, "W": {},
                                                        "M": {}}
         for resolution in self.main_container[crypto_currency_symbol]:
             self.main_container[crypto_currency_symbol][resolution] = {fiat_symbol: []}
-            candles_json = get_crypto_values(f"{crypto_currency_symbol.lower()}{fiat_symbol.lower()}", resolution, "1/01/2017", int(time.time()))
+            candles_json = get_crypto_values(f"{crypto_currency_symbol.lower()}{fiat_symbol.lower()}", resolution,
+                                             "1/01/2017", int(time.time()))
             candle_objects = change_candles_to_candle_objects(candles_json)
             for candle in candle_objects:
                 self.main_container[crypto_currency_symbol][resolution][fiat_symbol].append(candle)
@@ -57,7 +60,9 @@ class Database:
         return
 
     def save_database(self):
-        pass
+        with open('database\database.data', 'wb') as database:
+            pickle.dump(self.main_container, database)
 
     def load_database(self):
-        pass
+        with open('database\database.data', 'rb') as database:
+            self.main_container = pickle.load(database)
