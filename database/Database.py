@@ -26,8 +26,10 @@ class Database:
             candle_objects = change_candles_to_candle_objects(candles_json)
             for candle in candle_objects:
                 self.main_container[crypto_currency_symbol][resolution][fiat_symbol].append(candle)
+        self.save_database()
 
     def update_data_base(self):
+        self.save_database()
         pass
 
     def update_candles_on_currency(self, crypto_currency_symbol):
@@ -36,17 +38,19 @@ class Database:
             return
         while True:
             for fiat_currency in latest_date_dict['1']:
-                if not is_comparable_with_current_time(latest_date_dict['1'][fiat_currency]):
+                if not is_comparable_with_current_time(latest_date_dict['1'][fiat_currency], '1'):
                     latest_date_dict = self.get_latest_dates(crypto_currency_symbol)
                     for resolution in latest_date_dict:
                         for fiat in latest_date_dict[resolution]:
-                            candles_json = get_crypto_values(crypto_currency_symbol, resolution,
-                                                             latest_date_dict[resolution][fiat],
-                                                             datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
-                            candle_objects = change_candles_to_candle_objects(candles_json)
-                            for candle in candle_objects:
-                                self.main_container[crypto_currency_symbol][resolution][fiat].append(candle)
+                            if not is_comparable_with_current_time(latest_date_dict[resolution][fiat], resolution):
+                                candles_json = get_crypto_values(crypto_currency_symbol, resolution,
+                                                                 latest_date_dict[resolution][fiat],
+                                                                 datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+                                candle_objects = change_candles_to_candle_objects(candles_json)
+                                for candle in candle_objects:
+                                    self.main_container[crypto_currency_symbol][resolution][fiat].append(candle)
                 else:
+                    self.save_database()
                     break
 
     def get_latest_dates(self, crypto_currency_symbol):
@@ -61,12 +65,11 @@ class Database:
         return
 
     def save_database(self):
-        with open('database\database.data', 'wb') as database:
+        with open('data\database.data', 'wb') as database:
             pickle.dump(self.main_container, database)
 
     def load_database(self):
-        file = 'database\database.data'
+        file = 'data\database.data'
         if os.path.isfile(file) and os.path.getsize(file) > 0:
-            print("in")
-            with open('database\database.data', 'rb') as database:
+            with open(file, 'rb') as database:
                 self.main_container = pickle.load(database)
