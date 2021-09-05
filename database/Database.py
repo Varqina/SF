@@ -7,6 +7,7 @@ from data_requests.CryptoRequests import get_crypto_values, change_candles_to_ca
 from data_requests.TimeManager import is_comparable_with_current_time
 
 
+
 class Database:
     def __init__(self):
         #   {{crypto_currency_symbol:{resolution:{fiat:[]}}}}

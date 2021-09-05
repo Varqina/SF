@@ -129,5 +129,4 @@ dmypy.json
 .pyre/
 
 Password/
-venv/
-test.py
+test.py/

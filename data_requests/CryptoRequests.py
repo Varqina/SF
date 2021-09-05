@@ -1,12 +1,20 @@
-import time
-
 import requests as requests
-import Password.PasswordStrings as list_of_strings
-import json
-
 from data_requests.TimeManager import convert_data_to_unix
 from database.Candle import Candle
 from database.Decorators import measure_time
+import Password.PasswordStrings as tokens
+
+
+class ApiManager:
+    def __init__(self):
+        self.api_keys = [tokens.token1, tokens.token2, tokens.token3]
+
+    def get_api_key(self):
+        self.api_keys.append(self.api_keys.pop(0))
+        return self.api_keys[0]
+
+
+keys = ApiManager()
 
 
 @measure_time
@@ -17,7 +25,7 @@ def get_crypto_values(symbol, resolution, from_date, to_date):
         "resolution": resolution,
         "from": convert_data_to_unix(from_date),
         "to": convert_data_to_unix(to_date),
-        "token": list_of_strings.token}
+        "token": keys.get_api_key}
     response = requests.get("https://finnhub.io/api/v1/crypto/candle?", params=parameters)
     return response.json()
 
@@ -27,7 +35,7 @@ def get_all_crypto_symbols(exchange="binance"):
     symbols = []
     parameters = {
         "exchange": exchange,
-        "token": list_of_strings.token}
+        "token": keys.get_api_key}
     response = requests.get("https://finnhub.io/api/v1/crypto/symbol?", params=parameters)
     for symbol in response.json():
         symbols.append(symbol["symbol"])
