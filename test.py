@@ -1,21 +1,10 @@
-import time
+import threading
 
-from data_requests.TimeManager import convert_unix_to_data
-
-
-def add_b(func):
-    def wrapper():
-        func()
-        print('b')
-        return func()
-    return wrapper
-
-@add_b
-def test():
-    print('a')
-    return True
+def printing(i):
+    while True:
+        print(f'{i}\n')
 
 
-a = convert_unix_to_data(int(time.time()))
-print(a)
-print(a[:7])
+for i in range(2):
+    t = threading.Thread(target=printing, args=(i,))
+    t.start()

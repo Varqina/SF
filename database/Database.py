@@ -14,6 +14,25 @@ class Database:
         #   {{crypto_currency_symbol:{resolution:{fiat:[]}}}}
         self.main_container = {}
         self.load_database()
+        self.read_crypto_from_file()
+
+    def read_crypto_from_file(self):
+        file = 'data\crypto_data.txt'
+        if os.path.isfile(file) and os.path.getsize(file) > 0:
+            with open(file) as input_data:
+                data = input_data.read()
+                symbols = data.split("\n")
+            fiat_symbol = ""
+            for symbol in symbols:
+                if "USDT" in symbol:
+                    fiat_symbol = "USDT"
+                elif "USD" in symbol:
+                    fiat_symbol = "USD"
+                elif "EUR" in symbol:
+                    fiat_symbol = "EUR"
+                crypto_currency_symbol = symbol.replace(fiat_symbol, "")
+                self.add_to_data_base(crypto_currency_symbol, fiat_symbol)
+
 
     def add_to_data_base(self, crypto_currency_symbol, fiat_symbol):
         if crypto_currency_symbol in self.main_container and fiat_symbol in self.main_container[crypto_currency_symbol][
@@ -31,8 +50,9 @@ class Database:
         self.save_database()
 
     def update_data_base(self):
-        self.save_database()
-        pass
+        for currency_symbol in self.main_container:
+            self.update_candles_on_currency(currency_symbol)
+            #tutaj trzeba zrobic watki i dodatkowo zrobic save i copy jako jedno
 
     def update_candles_on_currency(self, crypto_currency_symbol):
         latest_date_dict = self.get_latest_dates(crypto_currency_symbol)
@@ -51,9 +71,9 @@ class Database:
                                 candle_objects = change_candles_to_candle_objects(candles_json)
                                 for candle in candle_objects:
                                     self.main_container[crypto_currency_symbol][resolution][fiat].append(candle)
-                                    self.save_database()
                 else:
                     break
+                self.save_database()
 
     def get_latest_dates(self, crypto_currency_symbol):
         symbol_data = self.main_container[crypto_currency_symbol]

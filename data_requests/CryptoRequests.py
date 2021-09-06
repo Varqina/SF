@@ -5,7 +5,7 @@ from database.Decorators import measure_time
 import Password.PasswordStrings as tokens
 
 
-class ApiManager:
+class ApiKeyManager:
     def __init__(self):
         self.api_keys = [tokens.token1, tokens.token2, tokens.token3]
 
@@ -14,7 +14,7 @@ class ApiManager:
         return self.api_keys[0]
 
 
-keys = ApiManager()
+keys = ApiKeyManager()
 
 
 def get_crypto_values(symbol, resolution, from_date, to_date):
