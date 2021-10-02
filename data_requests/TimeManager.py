@@ -1,6 +1,6 @@
 import time
 import datetime
-
+from calendar import monthrange
 
 def convert_data_to_unix(date):
     if type(date) is int:
@@ -21,13 +21,20 @@ def is_comparable_with_current_time(time_value, resolution):
     compared_value = int(time.time()) - time_value
     candle_time_value = convert_unix_to_data(time_value)
     current_time = convert_unix_to_data(int(time.time()))
-    if resolution == '1' or resolution == '5':
-        return True if candle_time_value[:16] == current_time[:16] else False
-    elif resolution == '15' or resolution == '30':
-        return True if candle_time_value[:15] == current_time[:15] else False
+    if resolution == '1':
+        return True if compared_value < 1*60 else False
+    elif resolution == '5':
+        return True if compared_value < 5*60 else False
+    elif resolution == '15':
+        return True if compared_value < 15*60 else False
+    elif resolution == '30':
+        return True if compared_value < 30*60 else False
     elif resolution == '60':
-        return True if candle_time_value[:13] == current_time[:13] else False
-    elif resolution == 'D' or resolution == 'W':
-        return True if candle_time_value[:10] == current_time[:10] else False
+        return True if compared_value < 60*60 else False
+    elif resolution == 'D':
+        return True if compared_value < 24*60*60 else False
+    elif resolution == 'W':
+        return True if compared_value < 7*24*60*60 else False
     elif resolution == 'M':
-        return True if candle_time_value[:7] == current_time[:7] else False
+        num_days = int(monthrange(int(current_time[:4]), int(current_time[5:7]))[1])
+        return True if compared_value < num_days*7*24*60*60 else False
