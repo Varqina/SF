@@ -40,7 +40,7 @@ class Database:
             return
         if crypto_currency_symbol not in self.main_container:
             # add "1": {}, "5": {} to extend resolution
-            self.main_container[crypto_currency_symbol] = {"60": {}, "D": {},
+            self.main_container[crypto_currency_symbol] = {"15":{},"30": {},"60": {}, "D": {},
                                                            "W": {},
                                                            "M": {}}
         for resolution in self.main_container[crypto_currency_symbol]:
