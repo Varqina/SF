@@ -52,7 +52,7 @@ def get_crypto_symbol(symbol, fiat, exchange="binance"):
         return symbols
 
 
-def change_candles_to_candle_objects(candles_json):
+def change_candles_to_candle_objects(candles_json, resolution, symbol, fiat):
     received_candles = len(candles_json['c'])
     if received_candles == 0:
         return
@@ -60,7 +60,8 @@ def change_candles_to_candle_objects(candles_json):
     for candle in range(received_candles):
         if len(candle_objects) > 0:
             previously_closed = candle_objects[-1].close_candle
-        temp_candle = Candle(candles_json['c'][candle], candles_json['o'][candle], candles_json['h'][candle],
-                             candles_json['l'][candle], candles_json['v'][candle], candles_json['t'][candle])
+        temp_candle = Candle(candles_json['o'][candle], candles_json['c'][candle], candles_json['h'][candle],
+                             candles_json['l'][candle], candles_json['v'][candle], candles_json['t'][candle],
+                             resolution, symbol, fiat)
         candle_objects.append(temp_candle)
     return candle_objects

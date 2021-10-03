@@ -1,8 +1,16 @@
 class Candle:
-    def __init__(self, close_candle, open_candle, height, low, volume, time):
+    def __init__(self, open_candle, close_candle, height, low, volume, time, resolution, symbol, fiat):
         self.close_candle = close_candle
         self.open_candle = open_candle
         self.height = height
         self.low = low
         self.volume = volume
         self.time = time
+        self.resolution = resolution
+        self.symbol = symbol
+        self.fiat = fiat
+        self.color = self.get_color()
+        self.counter = 0
+
+    def get_color(self):
+        return "Green" if self.close_candle - self.open_candle > 0 else "Red"
