@@ -1,5 +1,6 @@
 import time
 
+from Test.TestOnDataBase import TestOnDataBase
 from candle_prediction.OwnPrediction import OwnPrediction
 from data_requests.TimeManager import convert_unix_to_data
 from database.Database import Database
@@ -14,8 +15,12 @@ end1 = time.time()
 #print(str(end1-start1))
 
 start = time.time()
-own_prediction = OwnPrediction(database)
-own_prediction.test_performance(crypto='BTC', fiat="USDT")
+# TODO test pattern
+test = TestOnDataBase(database)
+test.check_and_adjust_candles_pattern_hammer()
+
+#own_prediction = OwnPrediction(database)
+#own_prediction.test_performance(crypto='BTC', fiat="USDT")
 #result = own_prediction.own_up_strength('ADA', '60', "EUR")
 #result.get_result()
 end = time.time()
