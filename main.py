@@ -17,7 +17,7 @@ end1 = time.time()
 start = time.time()
 # TODO test pattern
 test = TestOnDataBase(database)
-test.check_and_adjust_candles_pattern_hammer()
+test.check_candle_hammer_pattern()
 
 #own_prediction = OwnPrediction(database)
 #own_prediction.test_performance(crypto='BTC', fiat="USDT")

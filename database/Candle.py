@@ -13,4 +13,4 @@ class Candle:
         self.counter = 0
 
     def get_color(self):
-        return "Green" if self.open_candle - self.close_candle > 0 else "Red"
+        return "Green" if self.open_candle - self.close_candle < 0 else "Red"
