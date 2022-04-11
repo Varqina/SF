@@ -1,6 +1,6 @@
 import requests as requests
 from data_requests.TimeManager import convert_data_to_unix
-from database.Candle import Candle
+from database.Candle import CandleCrypto
 import Password.PasswordStrings as tokens
 
 
@@ -60,8 +60,8 @@ def change_candles_to_candle_objects(candles_json, resolution, symbol, fiat):
     for candle in range(received_candles):
         if len(candle_objects) > 0:
             previously_closed = candle_objects[-1].close_candle
-        temp_candle = Candle(candles_json['o'][candle], candles_json['c'][candle], candles_json['h'][candle],
-                             candles_json['l'][candle], candles_json['v'][candle], candles_json['t'][candle],
-                             resolution, symbol, fiat)
+        temp_candle = CandleCrypto(candles_json['o'][candle], candles_json['c'][candle], candles_json['h'][candle],
+                                   candles_json['l'][candle], candles_json['v'][candle], candles_json['t'][candle],
+                                   resolution, symbol, fiat)
         candle_objects.append(temp_candle)
     return candle_objects
