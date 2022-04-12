@@ -7,6 +7,20 @@ from data_requests.TimeManager import convert_data_to_unix
 from database.Candle import CandleCrypto
 
 
+def change_json_candles_for_candle_objects(candles_data, resolution, symbol):
+    candles_data = candles_data.json()
+    received_candles_data_length = len(candles_data['c'])
+    if received_candles_data_length == 0:
+        return
+    candle_objects = []
+    for index in range(received_candles_data_length):
+        temp_candle = CandleCrypto(candles_data['o'][index], candles_data['c'][index], candles_data['h'][index],
+                                   candles_data['l'][index], candles_data['v'][index], candles_data['t'][index],
+                                   resolution, symbol)
+        candle_objects.append(temp_candle)
+    return candle_objects
+
+
 class ApiManager(ABC):
     def __init__(self):
         self.keys = ApiKeyManager()
@@ -16,11 +30,7 @@ class ApiManager(ABC):
         pass
 
     @abstractmethod
-    def change_json_candles_for_candle_objects(self, candles_json, resolution, symbol):
-        pass
-
-    @abstractmethod
-    def get_all_symbols_for_exchange(self, market):
+    def get_all_symbols_for_market(self, market):
         pass
 
 
@@ -43,24 +53,9 @@ class CryptoApiManager(ApiManager):
             "to": convert_data_to_unix(to_date),
             "token": self.keys.get_api_key()}
         response = requests.get("https://finnhub.io/api/v1/crypto/candle?", params=parameters)
-        json_response = response.json()
-        return json_response
+        return response
 
-    def change_json_candles_for_candle_objects(self, candles_json, resolution, symbol):
-        received_candles = len(candles_json['c'])
-        if received_candles == 0:
-            return
-        candle_objects = []
-        for candle in range(received_candles):
-            if len(candle_objects) > 0:
-                previously_closed = candle_objects[-1].close_candle
-            temp_candle = CandleCrypto(candles_json['o'][candle], candles_json['c'][candle], candles_json['h'][candle],
-                                       candles_json['l'][candle], candles_json['v'][candle], candles_json['t'][candle],
-                                       resolution, symbol)
-            candle_objects.append(temp_candle)
-        return candle_objects
-
-    def get_all_symbols_for_market(self, market):
+    def get_all_symbols_for_market(self, market="binance"):
         symbols = []
         parameters = {
             "exchange": market,
@@ -69,3 +64,39 @@ class CryptoApiManager(ApiManager):
         for symbol in response.json():
             symbols.append(symbol["symbol"])
         return symbols
+
+
+class StockApiManager(ApiManager):
+
+    def get_values_for_symbol(self, symbol, resolution, from_date, to_date):
+        # US index only
+        arguments = {
+            "symbol": symbol,
+            "resolution": resolution,
+            "from": convert_data_to_unix(from_date),
+            "to": convert_data_to_unix(to_date),
+            "token": self.keys.get_api_key()}
+        response = requests.get("https://finnhub.io/api/v1/stock/candle?", params=arguments)
+        return response
+
+    def get_all_symbols_for_market(self, market="US"):
+        symbols = []
+        arguments = {
+            "exchange": market,
+            "token": self.keys.get_api_key()}
+        response = requests.get("https://finnhub.io/api/v1/stock/symbol?", params=arguments)
+        json_response = response.json()
+        for symbol in json_response:
+            symbols.append(symbol["symbol"])
+        return symbols
+
+    # consider it when all pattern recognitions are done as alternative for GWP data provider
+    def get_stock_values_marketstack(self, access_key, symbols, from_date, to_date):
+        # eod daily only
+        arguments = {
+            "access_key": access_key,
+            "symbols": symbols,  # CDR.XWAR
+            "from": convert_data_to_unix(from_date),  # 2020-04-01
+            "to": convert_data_to_unix(to_date)}
+        response = requests.get("ttp://api.marketstack.com/v1/eod?", params=arguments)
+        return response
