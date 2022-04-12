@@ -1,13 +1,14 @@
 from datetime import datetime
 from abc import ABC, abstractmethod
 from data.DataManager import load_database, read_data_from_file, save_database
+from data_requests.CryptoRequests import get_crypto_values
 from data_requests.StockRequests import get_stock_values_finehub, change_stock_json_candles_to_candle_objects
 
 log = False
 
 
 class Database(ABC):
-    def __int__(self, market_name):
+    def __init__(self, market_name):
         #   {{stock_symbol:{resolution:[]}}}
         self.market_name = market_name
         self.main_container = load_database(self.market_name)
@@ -60,7 +61,18 @@ class Database(ABC):
 
 
 class DatabaseStock(Database):
+    def __init__(self):
+        super().__init__("stock")
 
     def make_api_request(self, index, resolution, latest_candle_time):
         return get_stock_values_finehub(index, resolution, latest_candle_time[resolution].time,
                                         datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+
+
+class DatabaseCrypto(Database):
+    def __init__(self):
+        super().__init__("crypto")
+
+    def make_api_request(self, crypto_currency_symbol, resolution, latest_candle_time):
+        return get_crypto_values(crypto_currency_symbol, resolution, latest_candle_time[resolution].time,
+                                 datetime.now().strftime("%d/%m/%Y %H:%M:%S"))

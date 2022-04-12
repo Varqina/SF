@@ -19,11 +19,8 @@ class Candle(ABC):
 
 
 class CandleCrypto(Candle):
-    def __init__(self, open_candle, close_candle, height, low, volume, time, resolution, symbol, fiat):
-        super(CandleCrypto, self).__init__(close_candle, open_candle, height, low, volume, time, resolution, symbol)
-        self.fiat = fiat
+    pass
 
 
 class CandleStock(Candle):
-    def __init__(self, open_candle, close_candle, height, low, volume, time, resolution, symbol):
-        super(CandleStock, self).__init__(close_candle, open_candle, height, low, volume, time, resolution, symbol)
+    pass

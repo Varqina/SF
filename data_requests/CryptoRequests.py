@@ -15,8 +15,7 @@ class ApiKeyManager:
 
 keys = ApiKeyManager()
 
-def get_crypto_values(symbol, resolution, fiat, from_date, to_date):
-    symbol = get_crypto_symbol(symbol, fiat)
+def get_crypto_values(symbol, resolution, from_date, to_date):
     parameters = {
         "symbol": symbol,
         "resolution": resolution,
@@ -52,7 +51,7 @@ def get_crypto_symbol(symbol, fiat, exchange="binance"):
         return symbols
 
 
-def change_candles_to_candle_objects(candles_json, resolution, symbol, fiat):
+def change_candles_to_candle_objects(candles_json, resolution, symbol):
     received_candles = len(candles_json['c'])
     if received_candles == 0:
         return
@@ -62,6 +61,6 @@ def change_candles_to_candle_objects(candles_json, resolution, symbol, fiat):
             previously_closed = candle_objects[-1].close_candle
         temp_candle = CandleCrypto(candles_json['o'][candle], candles_json['c'][candle], candles_json['h'][candle],
                                    candles_json['l'][candle], candles_json['v'][candle], candles_json['t'][candle],
-                                   resolution, symbol, fiat)
+                                   resolution, symbol)
         candle_objects.append(temp_candle)
     return candle_objects
