@@ -17,6 +17,9 @@ class Candle(ABC):
     def get_color(self):
         return "Green" if self.open_candle - self.close_candle < 0 else "Red"
 
+    def print_candle(self):
+        print(f"Time: {self.time} Open {self.open_candle} Close {self.close_candle}")
+
 
 class CandleCrypto(Candle):
     pass
