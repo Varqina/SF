@@ -6,7 +6,7 @@ from shutil import copyfile
 
 from data_requests.CryptoRequests import get_crypto_values, change_candles_to_candle_objects
 from data_requests.TimeManager import is_comparable_with_current_time, convert_unix_to_data
-from database.DatabaseAbstract import Database
+from database.Database import Database
 
 log = False
 
@@ -22,22 +22,6 @@ class DatabaseCrypto(Database):
         pass
 
 
-    def read_crypto_from_file(self):
-        file = 'data\crypto_data.txt'
-        if os.path.isfile(file) and os.path.getsize(file) > 0:
-            with open(file) as input_data:
-                data = input_data.read()
-                symbols = data.split("\n")
-            fiat_symbol = ""
-            for symbol in symbols:
-                if "USDT" in symbol:
-                    fiat_symbol = "USDT"
-                elif "USD" in symbol:
-                    fiat_symbol = "USD"
-                elif "EUR" in symbol:
-                    fiat_symbol = "EUR"
-                crypto_currency_symbol = symbol.replace(fiat_symbol, "")
-                self.add_to_data_base(crypto_currency_symbol, fiat_symbol)
 
     def add_to_data_base(self, crypto_currency_symbol, fiat_symbol):
         if crypto_currency_symbol in self.main_container and \
