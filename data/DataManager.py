@@ -9,11 +9,15 @@ def load_database(market):
         if os.path.isfile(file) and os.path.getsize(file) > 0:
             with open(file, 'rb') as database:
                 return pickle.load(database)
+        else:
+            return {}
     except EOFError:
         file = f'data\\backup_{market}.data'
         if os.path.isfile(file) and os.path.getsize(file) > 0:
             with open(file, 'rb') as database:
                 return pickle.load(database)
+        else:
+            return {}
 
 
 def read_data_from_file(market):
@@ -23,6 +27,8 @@ def read_data_from_file(market):
             data = input_data.read()
             data_indexes = data.split("\n")
             return data_indexes
+    else:
+        return {}
 
 
 def save_database(market, data):
