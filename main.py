@@ -1,18 +1,15 @@
 import time
 
-from Test.TestOnDataBase import TestOnDataBase
-from candle_prediction.OwnPrediction import OwnPrediction
-from data_requests.TimeManager import convert_unix_to_data
-from data_requests.TradingViewPredictions import TradingViewPredictions
-from database.DatabaseCrypto import Database
+from database.Database import DatabaseStock, DatabaseCrypto
+
+stock_database = DatabaseStock()
+
+stock_database.main_container['AAPL']['15'][0].print_candle()
+#crypto_database = DatabaseCrypto()
 
 
-"""Environments set"""
-database_update = False
-"""End of environment set"""
-start1 = time.time()
-database = Database(database_update)
-end1 = time.time()
+
+
 #print(str(end1-start1))
 
 #start = time.time()
