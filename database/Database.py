@@ -1,8 +1,7 @@
 from datetime import datetime
 from abc import ABC, abstractmethod
 from data.DataManager import load_database, read_data_from_file, save_database
-from data_requests.CryptoRequests import get_crypto_values
-from data_requests.StockRequests import get_stock_values_finehub, change_stock_json_candles_to_candle_objects
+from data_requests.ApiRequests import change_json_candles_for_candle_objects, CryptoApiManager, StockApiManager
 
 log = False
 
@@ -46,7 +45,7 @@ class Database(ABC):
                 list_of_candles_for_index_and_resolution = self.main_container[index][resolution]
                 candles_json = self.make_api_request(index, resolution, latest_candles_dict[resolution].time)
                 if candles_json is not None:
-                    candle_objects = change_stock_json_candles_to_candle_objects(candles_json, resolution, index)
+                    candle_objects = change_json_candles_for_candle_objects(candles_json, resolution, index)
                     # It download current candle from the stock. It is removed here to avoid any issues
                     candle_objects.pop(-1)
 
@@ -63,16 +62,19 @@ class Database(ABC):
 class DatabaseStock(Database):
     def __init__(self):
         super().__init__("stock")
+        self.api_manager = StockApiManager()
 
     def make_api_request(self, index, resolution, latest_candle_time):
-        return get_stock_values_finehub(index, resolution, latest_candle_time[resolution].time,
-                                        datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+        return self.api_manager.get_values_for_symbol(index, resolution, latest_candle_time[resolution].time,
+                                                      datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
 
 
 class DatabaseCrypto(Database):
     def __init__(self):
         super().__init__("crypto")
+        self.api_manager = CryptoApiManager()
 
     def make_api_request(self, crypto_currency_symbol, resolution, latest_candle_time):
-        return get_crypto_values(crypto_currency_symbol, resolution, latest_candle_time[resolution].time,
-                                 datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+        return self.api_manager.get_values_for_symbol(crypto_currency_symbol, resolution,
+                                                      latest_candle_time[resolution].time,
+                                                      datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
