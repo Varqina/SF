@@ -1,3 +1,5 @@
+from random import randint
+
 import Password.PasswordStrings as tokens
 from abc import ABC, abstractmethod
 
@@ -6,9 +8,12 @@ import requests
 from data_requests.TimeManager import convert_data_to_unix
 from database.Candle import CandleCrypto
 
+log = False
 
 def change_json_candles_for_candle_objects(candles_data, resolution, symbol):
     candles_data = candles_data.json()
+
+    #expection very ofter solve it by try/catch and retry with somme deleay
     received_candles_data_length = len(candles_data['c'])
     if received_candles_data_length == 0:
         return
@@ -36,11 +41,12 @@ class ApiManager(ABC):
 
 class ApiKeyManager:
     def __init__(self):
-        self.api_keys = [tokens.token1, tokens.token2, tokens.token3]
+        self.api_keys = [tokens.token1, tokens.token2, tokens.token3, tokens.token4]
 
     def get_api_key(self):
-        self.api_keys.append(self.api_keys.pop(0))
-        return self.api_keys[0]
+        key = randint(0, len(self.api_keys)-1)
+        self.api_keys.append(self.api_keys.pop(key))
+        return self.api_keys[key]
 
 
 class CryptoApiManager(ApiManager):
@@ -77,6 +83,8 @@ class StockApiManager(ApiManager):
             "to": convert_data_to_unix(to_date),
             "token": self.keys.get_api_key()}
         response = requests.get("https://finnhub.io/api/v1/stock/candle?", params=arguments)
+        if log:
+            print(response.request.url)
         return response
 
     def get_all_symbols_for_market(self, market="US"):
