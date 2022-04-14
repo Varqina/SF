@@ -2,8 +2,36 @@ from datetime import datetime
 from abc import ABC, abstractmethod
 from data.DataManager import load_database, read_data_from_file, save_database
 from data_requests.ApiRequests import change_json_candles_for_candle_objects, CryptoApiManager, StockApiManager
+from data_requests.TimeManager import convert_data_to_unix, is_comparable_with_current_time
 
 log = False
+
+
+def count_end_time_with_api_limits(resolution, from_time):
+    limit = 0
+    resolution_unix_time_representation = 0
+    time_now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    if resolution == "15":
+        limit = 1404
+        resolution_unix_time_representation = 900
+    elif resolution == "30":
+        limit = 704
+        resolution_unix_time_representation = 1800
+    elif resolution == "60":
+        limit = 352
+        resolution_unix_time_representation = 3600
+    end_time = from_time + (limit * resolution_unix_time_representation)
+
+    if limit == 0:
+        end_time = time_now
+
+    return convert_data_to_unix(end_time)
+
+
+def count_from_time_for_first_time():
+    from_time = int(datetime.now().timestamp()) - 31556926
+    print(from_time)
+    return from_time
 
 
 class Database(ABC):
@@ -26,7 +54,7 @@ class Database(ABC):
 
     def download_candles_for_first_time(self, index):
         for resolution in self.main_container[index]:
-            response_candles_json = self.make_api_request(index, resolution, 955620148)
+            response_candles_json = self.make_api_request(index, resolution, count_from_time_for_first_time())
             if response_candles_json is not None:
                 candle_objects = change_json_candles_for_candle_objects(response_candles_json, resolution, index)
                 for candle in candle_objects:
@@ -49,27 +77,34 @@ class Database(ABC):
         return latest_date_dict
 
     def update_candles_on_market_index(self, index):
+        print("robie update")
         latest_candles_dict = self.get_latest_dates(index)
         if log:
             print(latest_candles_dict)
         if latest_candles_dict is not None and len(latest_candles_dict) > 0:
+            loop = True
             for resolution in latest_candles_dict:
-                list_of_candles_for_index_and_resolution = self.main_container[index][resolution]
-                candles_json = self.make_api_request(index, resolution, latest_candles_dict[resolution].time)
-                if candles_json is not None:
-                    candle_objects = change_json_candles_for_candle_objects(candles_json, resolution, index)
-                    # It download current candle from the stock. It is removed here to avoid any issues
-                    candle_objects.pop(-1)
-                    for candle in candle_objects:
-                        candle.counter = len(list_of_candles_for_index_and_resolution)
-                        list_of_candles_for_index_and_resolution.append(candle)
-            save_database(self.market_name, self.main_container)
+                while loop:
+                    list_of_candles_for_index_and_resolution = self.main_container[index][resolution]
+                    print(resolution)
+                    print(len(self.main_container[index][resolution]))
+                    candles_json = self.make_api_request(index, resolution, latest_candles_dict[resolution].time)
+                    if candles_json is not None:
+                        candle_objects = change_json_candles_for_candle_objects(candles_json, resolution, index)
+                        # It download current candle from the stock. It is removed here to avoid any issues
+                        candle_objects.pop(-1)
+                        for candle in candle_objects:
+                            candle.counter = len(list_of_candles_for_index_and_resolution)
+                            list_of_candles_for_index_and_resolution.append(candle)
+                        if is_comparable_with_current_time(self.main_container[index][resolution][-1].time, resolution):
+                            loop = False
+                        else:
+                            latest_candles_dict = self.get_latest_dates(index)
+                        save_database(self.market_name, self.main_container)
 
     @abstractmethod
     def make_api_request(self, index, resolution, from_time):
         pass
-    #Limity 15 1404 30 704 60 352 D 5535 W 1149 M 265
-
 
 
 class DatabaseStock(Database):
@@ -79,7 +114,7 @@ class DatabaseStock(Database):
 
     def make_api_request(self, index, resolution, from_time):
         return self.api_manager.get_values_for_symbol(index, resolution, from_time,
-                                                      datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+                                                      count_end_time_with_api_limits(resolution, from_time))
 
 
 class DatabaseCrypto(Database):
@@ -90,4 +125,4 @@ class DatabaseCrypto(Database):
     def make_api_request(self, crypto_currency_symbol, resolution, from_time):
         return self.api_manager.get_values_for_symbol(crypto_currency_symbol, resolution,
                                                       from_time,
-                                                      datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+                                                      count_end_time_with_api_limits(resolution, from_time))
