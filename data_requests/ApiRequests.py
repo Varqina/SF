@@ -1,6 +1,6 @@
 from random import randint
 
-from password.PasswordManager import PasswordManager
+from passwords.PasswordManager import PasswordManager
 
 from abc import ABC, abstractmethod
 
