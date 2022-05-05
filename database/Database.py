@@ -1,6 +1,6 @@
 from datetime import datetime
 from abc import ABC, abstractmethod
-from data.DataManager import load_file, read_data_from_file, save_database
+from data.DataManager import load_file, read_data_from_file, save_data
 from data_requests.ApiRequests import change_json_candles_for_candle_objects, CryptoApiManager, StockApiManager
 from data_requests.TimeManager import convert_data_to_unix, is_comparable_with_current_time
 
@@ -50,7 +50,7 @@ class Database(ABC):
             if index not in self.main_container:
                 self.main_container[index] = {"15": [], "30": [], "60": [], "D": [], "W": [], "M": []}
                 self.download_candles_for_first_time(index)
-        save_database(self.market_name, self.main_container)
+        save_data(self.market_name, self.main_container)
 
     def download_candles_for_first_time(self, index):
         for resolution in self.main_container[index]:
@@ -100,7 +100,7 @@ class Database(ABC):
                             loop = False
                         else:
                             latest_candles_dict = self.get_latest_dates(index)
-                        save_database(self.market_name, self.main_container)
+                        save_data(self.market_name, self.main_container)
 
     @abstractmethod
     def make_api_request(self, index, resolution, from_time):

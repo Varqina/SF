@@ -31,11 +31,11 @@ def read_data_from_file(market):
         return {}
 
 
-def save_database(market, data):
+def save_data(file_name, data):
     # TODO zapis danych do osobnych plikow unikac trzymania wszystkiego w ramie
-    with open(f'data\\database_{market}.data', 'wb') as database:
-        pickle.dump(data, database)
-        copyfile(f'data\\database_{market}.data', f'data\\backup_{market}.data')
+    with open(f'data\\database_{file_name}.data', 'wb') as file:
+        pickle.dump(data, file)
+        copyfile(f'data\\database_{file_name}.data', f'data\\backup_{file_name}.data')
 
 
 
