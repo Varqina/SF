@@ -3,16 +3,16 @@ import pickle
 from shutil import copyfile
 
 
-def load_database(market):
+def load_file(file):
     try:
-        file = f'data\\database_{market}.data'
+        file = f'data\\database_{file}.data'
         if os.path.isfile(file) and os.path.getsize(file) > 0:
             with open(file, 'rb') as database:
                 return pickle.load(database)
         else:
             return {}
     except EOFError:
-        file = f'data\\backup_{market}.data'
+        file = f'data\\backup_{file}.data'
         if os.path.isfile(file) and os.path.getsize(file) > 0:
             with open(file, 'rb') as database:
                 return pickle.load(database)

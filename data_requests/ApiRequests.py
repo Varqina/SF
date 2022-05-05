@@ -1,6 +1,7 @@
 from random import randint
 
-import Password.PasswordStrings as tokens
+from password.PasswordManager import PasswordManager
+
 from abc import ABC, abstractmethod
 
 import requests
@@ -10,9 +11,10 @@ from database.Candle import CandleCrypto
 
 log = False
 
+
+
 def change_json_candles_for_candle_objects(candles_data, resolution, symbol):
     candles_data = candles_data.json()
-
     #expection very ofter solve it by try/catch and retry with somme deleay
     received_candles_data_length = len(candles_data['c'])
     if received_candles_data_length == 0:
@@ -28,7 +30,8 @@ def change_json_candles_for_candle_objects(candles_data, resolution, symbol):
 
 class ApiManager(ABC):
     def __init__(self):
-        self.keys = ApiKeyManager()
+        self.password_manager = PasswordManager()
+
 
     @abstractmethod
     def get_values_for_symbol(self, symbol, resolution, from_date, to_date):
@@ -39,16 +42,6 @@ class ApiManager(ABC):
         pass
 
 
-class ApiKeyManager:
-    def __init__(self):
-        self.api_keys = [tokens.token1, tokens.token2, tokens.token3, tokens.token4]
-
-    def get_api_key(self):
-        key = randint(0, len(self.api_keys)-1)
-        self.api_keys.append(self.api_keys.pop(key))
-        return self.api_keys[key]
-
-
 class CryptoApiManager(ApiManager):
 
     def get_values_for_symbol(self, symbol, resolution, from_date, to_date):
@@ -57,7 +50,7 @@ class CryptoApiManager(ApiManager):
             "resolution": resolution,
             "from": convert_data_to_unix(from_date),
             "to": convert_data_to_unix(to_date),
-            "token": self.keys.get_api_key()}
+            "token": self.password_manager.get_password()}
         response = requests.get("https://finnhub.io/api/v1/crypto/candle?", params=parameters)
         return response
 
@@ -65,7 +58,7 @@ class CryptoApiManager(ApiManager):
         symbols = []
         parameters = {
             "exchange": market,
-            "token": self.keys.get_api_key()}
+            "token": self.password_manager.get_password()}
         response = requests.get("https://finnhub.io/api/v1/crypto/symbol?", params=parameters)
         for symbol in response.json():
             symbols.append(symbol["symbol"])
@@ -81,7 +74,7 @@ class StockApiManager(ApiManager):
             "resolution": resolution,
             "from": convert_data_to_unix(from_date),
             "to": convert_data_to_unix(to_date),
-            "token": self.keys.get_api_key()}
+            "token": self.password_manager.get_password()}
         response = requests.get("https://finnhub.io/api/v1/stock/candle?", params=arguments)
         if log:
             print(response.request.url)
@@ -91,7 +84,7 @@ class StockApiManager(ApiManager):
         symbols = []
         arguments = {
             "exchange": market,
-            "token": self.keys.get_api_key()}
+            "token": self.password_manager.get_password()}
         response = requests.get("https://finnhub.io/api/v1/stock/symbol?", params=arguments)
         json_response = response.json()
         for symbol in json_response:
