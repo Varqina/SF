@@ -30,7 +30,6 @@ def count_end_time_with_api_limits(resolution, from_time):
 
 def count_from_time_for_first_time():
     from_time = int(datetime.now().timestamp()) - 31556926
-    print(from_time)
     return from_time
 
 
@@ -77,7 +76,6 @@ class Database(ABC):
         return latest_date_dict
 
     def update_candles_on_market_index(self, index):
-        print("robie update")
         latest_candles_dict = self.get_latest_dates(index)
         if log:
             print(latest_candles_dict)
@@ -86,18 +84,16 @@ class Database(ABC):
             for resolution in latest_candles_dict:
                 while loop:
                     list_of_candles_for_index_and_resolution = self.main_container[index][resolution]
-                    print(resolution)
-                    print(len(self.main_container[index][resolution]))
-                    candles_json = self.make_api_request(index, resolution, latest_candles_dict[resolution].time)
+                    candles_json = self.make_api_request(index, resolution, latest_candles_dict[resolution].time + 1)
                     if candles_json is not None:
                         candle_objects = change_json_candles_for_candle_objects(candles_json, resolution, index)
-                        # It download current candle from the stock. It is removed here to avoid any issues
-                        candle_objects.pop(-1)
                         for candle in candle_objects:
                             candle.counter = len(list_of_candles_for_index_and_resolution)
                             list_of_candles_for_index_and_resolution.append(candle)
                         if is_comparable_with_current_time(self.main_container[index][resolution][-1].time, resolution):
                             loop = False
+                            # It download current candle from the stock. It is removed here to avoid any issues
+                            list_of_candles_for_index_and_resolution.pop()
                         else:
                             latest_candles_dict = self.get_latest_dates(index)
                         save_data(self.market_name, self.main_container)

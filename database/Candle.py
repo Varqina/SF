@@ -1,7 +1,7 @@
-from abc import ABC
+import abc
 
 
-class Candle(ABC):
+class Candle(abc.ABC):
     def __init__(self, open_candle, close_candle, height, low, volume, time, resolution, symbol):
         self.close_candle = close_candle
         self.open_candle = open_candle

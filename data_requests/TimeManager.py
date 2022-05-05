@@ -19,7 +19,6 @@ def convert_unix_to_data(unix_data):
 
 def is_comparable_with_current_time(time_value, resolution):
     compared_value = int(time.time()) - time_value
-    candle_time_value = convert_unix_to_data(time_value)
     current_time = convert_unix_to_data(int(time.time()))
     if resolution == '1':
         return True if compared_value < 1*60 else False
